@@ -5,12 +5,12 @@ from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
 
-def print_table(data, title):
-    table_data = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
-    for language, stats in data.items():
-        table_data.append(
+def print_table(vacancies_data, title):
+    table_columns = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
+    for language, stats in vacancies_data.items():
+        table_columns.append(
             [language, stats['Вакансий найдено'], stats['Вакансий обработано'], stats['Средняя зарплата']])
-    table = AsciiTable(table_data, title)
+    table = AsciiTable(table_columns, title)
     print(table.table)
 
 
@@ -36,10 +36,12 @@ def predict_superjob_salary(payment_from, payment_to):
 
 def get_hh_vacancies(language):
     vacancies_url = "https://api.hh.ru/vacancies"
+    area_id = '1'
+    vacancies_per_page = '100'
     params = {
         'text': language,
-        'area': '1',
-        'per_page': '100',
+        'area': area_id,
+        'per_page': vacancies_per_page,
     }
     all_vacancies = []
     page = 0
@@ -47,22 +49,25 @@ def get_hh_vacancies(language):
         params['page'] = page
         response = requests.get(vacancies_url, params=params)
         response.raise_for_status()
-        data = response.json()
-        all_vacancies.extend(data['items'])
-        if page >= data['pages'] - 1:
+        vacancies_data = response.json()
+        all_vacancies.extend(vacancies_data['items'])
+        if page >= vacancies_data['pages'] - 1:
             break
         page += 1
         time.sleep(0.5)
-    return all_vacancies, data['found']
+    return all_vacancies, vacancies_data['found']
 
 
 def get_superjob_vacancies(language, api_key):
     vacancies_url = "https://api.superjob.ru/2.0/vacancies/"
+    start_page_number = 0
+    vacancies_per_page = 100
+    city_name = 'Москва'
     headers = {'X-Api-App-Id': api_key}
     params = {
-        'page': 0,
-        'count': 100,
-        'town': 'Москва',
+        'page': start_page_number,
+        'count': vacancies_per_page,
+        'town': city_name,
         'keyword': language
     }
 
@@ -73,13 +78,13 @@ def get_superjob_vacancies(language, api_key):
         params['page'] = page
         response = requests.get(vacancies_url, headers=headers, params=params)
 
-        data = response.json()
-        all_vacancies.extend(data['objects'])
-        if len(all_vacancies) >= data['total']:
+        vacancies_data = response.json()
+        all_vacancies.extend(vacancies_data['objects'])
+        if len(all_vacancies) >= vacancies_data['total']:
             break
         page += 1
         time.sleep(0.5)
-    return all_vacancies, data['total']
+    return all_vacancies, vacancies_data['total']
 
 
 def fetch_sj_average_programmer_salaries(api_key, languages):
