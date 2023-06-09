@@ -73,12 +73,6 @@ def get_superjob_vacancies(language, api_key):
         params['page'] = page
         response = requests.get(vacancies_url, headers=headers, params=params)
 
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            print("Response content:", response.content)
-            raise e
-
         data = response.json()
         all_vacancies.extend(data['objects'])
         if len(all_vacancies) >= data['total']:
