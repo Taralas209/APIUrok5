@@ -15,22 +15,22 @@ def print_table(data, title):
 
 
 def predict_hh_salary(salary):
-    if salary is None or salary['currency'] != 'RUR':
+    if not salary or salary['currency'] != 'RUR':
         return None
-    if salary['from'] is not None and salary['to'] is not None:
+    if salary['from'] and salary['to']:
         return (salary['from'] + salary['to']) / 2
-    elif salary['from'] is not None:
+    elif salary['from']:
         return salary['from'] * 1.2
-    elif salary['to'] is not None:
+    elif salary['to']:
         return salary['to'] * 0.8
 
 
 def predict_superjob_salary(payment_from, payment_to):
-    if payment_from is not None and payment_to is not None:
+    if payment_from and payment_to:
         return (payment_from + payment_to) / 2
-    elif payment_from is not None:
+    elif payment_from:
         return payment_from * 1.2
-    elif payment_to is not None:
+    elif payment_to:
         return payment_to * 0.8
 
 
@@ -96,7 +96,7 @@ def fetch_sj_average_programmer_salaries(api_key, languages):
         salaries = []
         for vacancy in vacancies:
             predicted_salary = predict_superjob_salary(vacancy['payment_from'], vacancy['payment_to'])
-            if predicted_salary is not None:
+            if predicted_salary:
                 salaries.append(predicted_salary)
         average_salary = int(sum(salaries) / len(salaries)) if salaries else 0
         vacancies_superjob_salaries[language] = {
@@ -117,7 +117,7 @@ def fetch_hh_average_programmer_salaries(languages):
         salaries = []
         for vacancy in vacancies:
             predicted_salary = predict_hh_salary(vacancy['salary'])
-            if predicted_salary is not None:
+            if predicted_salary:
                 salaries.append(predicted_salary)
         average_salary = int(sum(salaries) / len(salaries)) if salaries else 0
         vacancies_hh_salaries[language] = {
