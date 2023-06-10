@@ -86,6 +86,7 @@ def get_superjob_vacancies(language, api_key):
 
 def fetch_sj_average_programmer_salaries(api_key, languages):
     vacancies_superjob_salaries = {}
+    delay_time = 0.5
 
     for language in languages:
         vacancies, total_vacancies = get_superjob_vacancies(language, api_key)
@@ -100,13 +101,14 @@ def fetch_sj_average_programmer_salaries(api_key, languages):
             "Вакансий обработано": len(salaries),
             "Средняя зарплата": average_salary
         }
-        time.sleep(0.5)
+        time.sleep(delay_time)
 
     return vacancies_superjob_salaries
 
 
 def fetch_hh_average_programmer_salaries(languages):
     vacancies_hh_salaries = {}
+    delay_time = 0.5
 
     for language in languages:
         vacancies, total_vacancies = get_hh_vacancies(language)
@@ -121,7 +123,7 @@ def fetch_hh_average_programmer_salaries(languages):
             "Вакансий обработано": len(salaries),
             "Средняя зарплата": average_salary
         }
-        time.sleep(0.5)
+        time.sleep(delay_time)
 
     return vacancies_hh_salaries
 
