@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
 
-def print_table(vacancies_data, title):
+def print_table(vvacancies_info_list, title):
     table_columns = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
-    for language, stats in vacancies_data.items():
+    for language, stats in vacancies_info_list.items():
         table_columns.append(
             [language, stats['Вакансий найдено'], stats['Вакансий обработано'], stats['Средняя зарплата']])
     table = AsciiTable(table_columns, title)
@@ -45,13 +45,13 @@ def get_hh_vacancies(language):
         params['page'] = page
         response = requests.get(vacancies_url, params=params)
         response.raise_for_status()
-        vacancies_data = response.json()
-        all_vacancies.extend(vacancies_data['items'])
-        if page >= vacancies_data['pages'] - 1:
+        vacancies_info_list = response.json()
+        all_vacancies.extend(vacancies_info_list['items'])
+        if page >= vacancies_info_list['pages'] - 1:
             break
         page += 1
         time.sleep(0.5)
-    return all_vacancies, vacancies_data['found']
+    return all_vacancies, vacancies_info_list['found']
 
 
 def get_superjob_vacancies(language, api_key):
@@ -74,13 +74,13 @@ def get_superjob_vacancies(language, api_key):
         params['page'] = page
         response = requests.get(vacancies_url, headers=headers, params=params)
 
-        vacancies_data = response.json()
-        all_vacancies.extend(vacancies_data['objects'])
-        if len(all_vacancies) >= vacancies_data['total']:
+        vacancies_info_list = response.json()
+        all_vacancies.extend(vacancies_info_list['objects'])
+        if len(all_vacancies) >= vacancies_info_list['total']:
             break
         page += 1
         time.sleep(0.5)
-    return all_vacancies, vacancies_data['total']
+    return all_vacancies, vacancies_info_list['total']
 
 
 def fetch_sj_average_programmer_salaries(api_key, languages):
@@ -96,9 +96,9 @@ def fetch_sj_average_programmer_salaries(api_key, languages):
                 salaries.append(predicted_salary)
         average_salary = int(sum(salaries) / len(salaries)) if salaries else 0
         vacancies_superjob_salaries[language] = {
-            "Вакансий найдено": total_vacancies,
-            "Вакансий обработано": len(salaries),
-            "Средняя зарплата": average_salary
+            "vacancies_found": total_vacancies,
+            "vacancies_processed": len(salaries),
+            "average_salary": average_salary
         }
         time.sleep(delay_time)
 
@@ -118,9 +118,9 @@ def fetch_hh_average_programmer_salaries(languages):
                 salaries.append(predicted_salary)
         average_salary = int(sum(salaries) / len(salaries)) if salaries else 0
         vacancies_hh_salaries[language] = {
-            "Вакансий найдено": total_vacancies,
-            "Вакансий обработано": len(salaries),
-            "Средняя зарплата": average_salary
+            "vacancies_found": total_vacancies,
+            "vacancies_processed": len(salaries),
+            "average_salary": average_salary
         }
         time.sleep(delay_time)
 
