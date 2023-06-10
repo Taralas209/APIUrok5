@@ -17,9 +17,8 @@ def print_table(vacancies_data, title):
 def get_predicted_hh_salary(salary):
     if not salary or salary['currency'] != 'RUR':
         return None
-    else:
-        result_predict_salary = predict_salary(salary['from'], salary['to'])
-        return result_predict_salary
+    result_predict_salary = predict_salary(salary['from'], salary['to'])
+    return result_predict_salary
 
 
 def predict_salary(payment_from, payment_to):
