@@ -9,7 +9,7 @@ def print_table(json_vacancy_descriptions, title):
     table_columns = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
     for language, stats in json_vacancy_descriptions.items():
         table_columns.append(
-            [language, stats['Вакансий найдено'], stats['Вакансий обработано'], stats['Средняя зарплата']])
+            [language, stats['vacancies_found'], stats['vacancies_processed'], stats['average_salary']])
     table = AsciiTable(table_columns, title)
     print(table.table)
 
@@ -73,6 +73,7 @@ def get_superjob_vacancies(language, api_key):
     while True:
         params['page'] = page
         response = requests.get(vacancies_url, headers=headers, params=params)
+        response.raise_for_status()
 
         json_vacancy_descriptions = response.json()
         all_vacancies.extend(json_vacancy_descriptions['objects'])
