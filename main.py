@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
 
-def print_table(vvacancies_info_list, title):
+def print_table(json_vacancy_descriptions, title):
     table_columns = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
-    for language, stats in vacancies_info_list.items():
+    for language, stats in json_vacancy_descriptions.items():
         table_columns.append(
             [language, stats['Вакансий найдено'], stats['Вакансий обработано'], stats['Средняя зарплата']])
     table = AsciiTable(table_columns, title)
@@ -17,8 +17,8 @@ def print_table(vvacancies_info_list, title):
 def get_predicted_hh_salary(salary):
     if not salary or salary['currency'] != 'RUR':
         return None
-    result_predict_salary = predict_salary(salary['from'], salary['to'])
-    return result_predict_salary
+    predicted_salary = predict_salary(salary['from'], salary['to'])
+    return predicted_salary
 
 
 def predict_salary(payment_from, payment_to):
@@ -45,13 +45,13 @@ def get_hh_vacancies(language):
         params['page'] = page
         response = requests.get(vacancies_url, params=params)
         response.raise_for_status()
-        vacancies_info_list = response.json()
-        all_vacancies.extend(vacancies_info_list['items'])
-        if page >= vacancies_info_list['pages'] - 1:
+        json_vacancy_descriptions = response.json()
+        all_vacancies.extend(json_vacancy_descriptions['items'])
+        if page >= json_vacancy_descriptions['pages'] - 1:
             break
         page += 1
         time.sleep(0.5)
-    return all_vacancies, vacancies_info_list['found']
+    return all_vacancies, json_vacancy_descriptions['found']
 
 
 def get_superjob_vacancies(language, api_key):
@@ -74,13 +74,13 @@ def get_superjob_vacancies(language, api_key):
         params['page'] = page
         response = requests.get(vacancies_url, headers=headers, params=params)
 
-        vacancies_info_list = response.json()
-        all_vacancies.extend(vacancies_info_list['objects'])
-        if len(all_vacancies) >= vacancies_info_list['total']:
+        json_vacancy_descriptions = response.json()
+        all_vacancies.extend(json_vacancy_descriptions['objects'])
+        if len(all_vacancies) >= json_vacancy_descriptions['total']:
             break
         page += 1
         time.sleep(0.5)
-    return all_vacancies, vacancies_info_list['total']
+    return all_vacancies, json_vacancy_descriptions['total']
 
 
 def fetch_sj_average_programmer_salaries(api_key, languages):
