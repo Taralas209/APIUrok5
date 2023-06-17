@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
 
-def print_table(json_vacancy_descriptions, title):
+def print_table(vacancy_descriptions, title):
     table_columns = [['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']]
-    for language, stats in json_vacancy_descriptions.items():
+    for language, stats in vacancy_descriptions.items():
         table_columns.append(
             [language, stats['vacancies_found'], stats['vacancies_processed'], stats['average_salary']])
     table = AsciiTable(table_columns, title)
@@ -45,13 +45,13 @@ def get_hh_vacancies(language):
         params['page'] = page
         response = requests.get(vacancies_url, params=params)
         response.raise_for_status()
-        json_vacancy_descriptions = response.json()
-        all_vacancies.extend(json_vacancy_descriptions['items'])
-        if page >= json_vacancy_descriptions['pages'] - 1:
+        vacancy_descriptions = response.json()
+        all_vacancies.extend(vacancy_descriptions['items'])
+        if page >= vacancy_descriptions['pages'] - 1:
             break
         page += 1
         time.sleep(0.5)
-    return all_vacancies, json_vacancy_descriptions['found']
+    return all_vacancies, vacancy_descriptions['found']
 
 
 def get_superjob_vacancies(language, api_key):
@@ -75,13 +75,13 @@ def get_superjob_vacancies(language, api_key):
         response = requests.get(vacancies_url, headers=headers, params=params)
         response.raise_for_status()
 
-        json_vacancy_descriptions = response.json()
-        all_vacancies.extend(json_vacancy_descriptions['objects'])
-        if len(all_vacancies) >= json_vacancy_descriptions['total']:
+        vacancy_descriptions = response.json()
+        all_vacancies.extend(vacancy_descriptions['objects'])
+        if len(all_vacancies) >= vacancy_descriptions['total']:
             break
         page += 1
         time.sleep(0.5)
-    return all_vacancies, json_vacancy_descriptions['total']
+    return all_vacancies, vacancy_descriptions['total']
 
 
 def fetch_sj_average_programmer_salaries(api_key, languages):
